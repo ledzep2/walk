@@ -16,6 +16,7 @@ import (
 )
 
 const notifyIconWindowClass = `\o/ Walk_NotifyIcon_Class \o/`
+const NIN_BALLOONUSERCLICK = win.WM_USER + 5 
 
 func init() {
 	MustRegisterWindowClass(notifyIconWindowClass)
@@ -67,6 +68,8 @@ func notifyIconWndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (resul
 		}
 
 		return 0
+	case NIN_BALLOONUSERCLICK:
+ 		ni.balloonClickedPublisher.Publish()
 	}
 
 	return win.DefWindowProc(hwnd, msg, wParam, lParam)
@@ -82,6 +85,7 @@ type NotifyIcon struct {
 	visible            bool
 	mouseDownPublisher MouseEventPublisher
 	mouseUpPublisher   MouseEventPublisher
+	balloonClickedPublisher EventPublisher
 }
 
 // NewNotifyIcon creates and returns a new NotifyIcon.
@@ -331,3 +335,7 @@ func (ni *NotifyIcon) MouseDown() *MouseEvent {
 func (ni *NotifyIcon) MouseUp() *MouseEvent {
 	return ni.mouseUpPublisher.Event()
 }
+
+func (ni *NotifyIcon) BallonClicked() *Event {
+ 	return ni.balloonClickedPublisher.Event()
+ }
